@@ -58,10 +58,9 @@ const drawRandomCircle = () => {
     const canvas = canvasRef.value
     if (!canvas) return
     mousePath.value = []
-    const rect = canvas.getBoundingClientRect()
 
-    canvas.width = rect.width
-    canvas.height = rect.height
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
 
     const ctx = canvas.getContext('2d')
     if (!ctx) return

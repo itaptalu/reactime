@@ -12,16 +12,17 @@
         <NuxtLink to="/">
             <Icon name="icon:logo" size="40" />
         </NuxtLink>
-        <button class="size-6" :disabled="currentScreen !== 'mouse'" @click="share">
+        <!-- <button class="size-6" :disabled="currentScreen !== 'mouse'" @click="share">
             <Icon v-if="currentScreen === 'mouse'" name="material-symbols:share-outline" />
-        </button>
+        </button> -->
+        <span class="size-6" />
     </header>
 </template>
 
 <script setup lang="ts">
 const currentScreen = useState<Screens>('currentScreen', () => 'start')
 
-const share = () => {
-    console.log('share')
-}
+// const share = () => {
+//     console.log('share')
+// }
 </script>
