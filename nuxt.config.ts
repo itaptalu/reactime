@@ -5,10 +5,6 @@ export default defineNuxtConfig({
     devtools: { enabled: true },
     ssr: true,
 
-    nitro: {
-        preset: 'github-pages',
-    },
-
     app: {
         head: {
             title: 'reactime',
