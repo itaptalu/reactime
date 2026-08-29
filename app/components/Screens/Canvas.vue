@@ -51,7 +51,7 @@ const initConfigModal = (e: any) => {
         left: `${e.clientX + 10}px`,
         top: `${e.clientY + 10}px`,
     }
-    configModal.show = true
+    // configModal.show = true
 }
 
 const drawRandomCircle = () => {
