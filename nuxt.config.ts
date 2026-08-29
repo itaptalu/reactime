@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     },
 
     app: {
+        baseURL: '/reactime/',
         head: {
             title: 'reactime',
             link: [
