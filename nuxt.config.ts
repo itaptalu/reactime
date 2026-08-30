@@ -1,9 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
     compatibilityDate: '2025-07-15',
     devtools: { enabled: true },
     ssr: true,
+
     app: {
         head: {
             title: 'reactime',
@@ -33,7 +35,8 @@ export default defineNuxtConfig({
         },
     },
 
-    modules: ['@nuxt/icon', '@nuxtjs/tailwindcss', '@nuxt/eslint', '@vueuse/nuxt'],
+    css: ['~/assets/css/main.css'],
+    modules: ['@nuxt/icon', '@nuxt/eslint', '@vueuse/nuxt', '@nuxt/ui'],
 
     icon: {
         size: '24px',
@@ -44,5 +47,9 @@ export default defineNuxtConfig({
                 dir: './app/assets/icons',
             },
         ],
+    },
+
+    vite: {
+        plugins: [tailwindcss()],
     },
 })

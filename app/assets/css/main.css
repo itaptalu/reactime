@@ -1,0 +1,37 @@
+@import 'tailwindcss';
+@import '@nuxt/ui';
+
+@theme {
+    --color-primary: #2daa8c;
+    --color-white: #fffff0;
+
+    --color-black: #1d1d1d;
+    --color-black-500: #8d8d8d;
+    --color-black-600: #5d5d5d;
+    --color-black-700: #3b3b3b;
+    --color-black-800: #30302e;
+    --color-black-900: #262626;
+
+    --leading-none: 1;
+}
+
+button {
+    cursor: pointer;
+}
+
+.shimmer {
+    background:
+        linear-gradient(90deg, #30302e 0%, #5d5d5d 40px, #30302e 80px),
+        linear-gradient(90deg, #30302e 0%, #5d5d5d 40px, #30302e 80px);
+    background-size: 200% 100%;
+    animation: shimmer-grad 2s infinite linear;
+}
+@keyframes shimmer-grad {
+    0% {
+        background-position: 100% 0;
+    }
+    40%,
+    100% {
+        background-position: -100% 0;
+    }
+}

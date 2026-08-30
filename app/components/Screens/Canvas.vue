@@ -27,7 +27,7 @@ import { onClickOutside } from '@vueuse/core'
 const emits = defineEmits(['toggleScreen'])
 
 const delay = useState('delay', () => 500 + Math.random() * 1000)
-const radius = useState('radius', () => 12)
+const radius = useState<number>('radius')
 const reactionTime = useState('reactionTime', () => 0)
 const mousePath = useState<{ x: number; y: number }[]>('mousePath', () => [])
 
