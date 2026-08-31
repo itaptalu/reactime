@@ -1,5 +1,5 @@
 declare global {
-    type Screens = 'start' | 'game' | 'result' | 'mouse'
+    type Screens = 'locker' | 'start' | 'game' | 'result' | 'mouse'
 }
 
 export {}
