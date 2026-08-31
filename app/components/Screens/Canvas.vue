@@ -1,10 +1,5 @@
 <template>
-    <canvas
-        ref="canvasRef"
-        class="w-full h-full relative z-0"
-        @click="handleCanvasClick"
-        @mousemove="handleMouseMove"
-    >
+    <canvas ref="canvasRef" class="w-full h-full relative z-0" @click="handleCanvasClick">
         game
     </canvas>
 </template>
@@ -17,6 +12,7 @@ const radius = useState<number>('radius')
 const best = useState<number>('best')
 const reactionTime = useState('reactionTime', () => 0)
 const mousePath = useState<{ x: number; y: number }[]>('mousePath', () => [])
+const sensitivity = useState('sensitivity', () => 0.5)
 
 let timer: ReturnType<typeof setTimeout>
 
@@ -26,59 +22,82 @@ const circle = reactive({
     x: 0,
     y: 0,
     appearedAt: 0,
+    visible: false,
 })
+
+const cursor = reactive({
+    x: 0,
+    y: 0,
+})
+
+const isLocked = () => document.pointerLockElement === canvasRef.value
+
+const draw = () => {
+    const canvas = canvasRef.value
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+    if (circle.visible) {
+        ctx.beginPath()
+        ctx.arc(circle.x, circle.y, radius.value, 0, Math.PI * 2)
+        ctx.fillStyle = '#2DAA8C'
+        ctx.fill()
+    }
+
+    ctx.beginPath()
+    ctx.arc(cursor.x, cursor.y, 6, 0, Math.PI * 3)
+    ctx.fillStyle = '#ffffff'
+    ctx.fill()
+    ctx.lineWidth = 1
+    ctx.strokeStyle = '#000000'
+    ctx.stroke()
+}
 
 const drawRandomCircle = () => {
     const canvas = canvasRef.value
     if (!canvas) return
     mousePath.value = []
 
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
     const r = radius.value
     const topOffset = 188
 
     circle.x = r + Math.random() * (canvas.width - r * 2)
     circle.y = topOffset + r + Math.random() * (canvas.height - topOffset - r * 2)
-
-    ctx.beginPath()
-    ctx.arc(circle.x, circle.y, r, 0, Math.PI * 2)
-    ctx.fillStyle = '#2DAA8C'
-    ctx.fill()
-
+    circle.visible = true
     circle.appearedAt = performance.now()
+
+    draw()
 }
 
-const handleMouseMove = (e: MouseEvent) => {
+const handlePointerLockMove = (e: MouseEvent) => {
+    if (!isLocked()) return
     const canvas = canvasRef.value
     if (!canvas) return
 
-    const rect = canvas.getBoundingClientRect()
+    cursor.x = Math.min(Math.max(cursor.x + e.movementX * sensitivity.value, 0), canvas.width)
+    cursor.y = Math.min(Math.max(cursor.y + e.movementY * sensitivity.value, 0), canvas.height)
 
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
+    mousePath.value.push({ x: cursor.x, y: cursor.y })
 
-    mousePath.value.push({ x, y })
+    const distance = Math.sqrt((cursor.x - circle.x) ** 2 + (cursor.y - circle.y) ** 2)
+    canvas.style.cursor = distance <= radius.value ? 'pointer' : 'none'
 
-    const distance = Math.sqrt((x - circle.x) ** 2 + (y - circle.y) ** 2)
-
-    canvas.style.cursor = distance <= radius.value ? 'pointer' : 'default'
+    draw()
 }
 
-const handleCanvasClick = (e: MouseEvent) => {
+const handleCanvasClick = () => {
     const canvas = canvasRef.value
     if (!canvas) return
 
-    const rect = canvas.getBoundingClientRect()
+    if (!isLocked()) {
+        canvas.requestPointerLock()
+        return
+    }
 
-    const mouseX = e.clientX - rect.left
-    const mouseY = e.clientY - rect.top
-
-    const distance = Math.sqrt((mouseX - circle.x) ** 2 + (mouseY - circle.y) ** 2)
+    const distance = Math.sqrt((cursor.x - circle.x) ** 2 + (cursor.y - circle.y) ** 2)
 
     if (distance <= radius.value) {
         handleCircleClick()
@@ -87,6 +106,7 @@ const handleCanvasClick = (e: MouseEvent) => {
 
 const handleCircleClick = () => {
     reactionTime.value = Math.floor(Number(performance.now() - circle.appearedAt))
+    circle.visible = false
 
     updateBest()
     emits('toggleScreen', 'result')
@@ -102,13 +122,32 @@ const updateBest = () => {
     localStorage.setItem('best', best.value.toString())
 }
 
-onMounted(() => {
-    if (canvasRef.value) {
-        timer = setTimeout(drawRandomCircle, delay.value)
+const handleLockChange = () => {
+    if (!isLocked() && canvasRef.value) {
+        canvasRef.value.style.cursor = 'default'
     }
+}
+
+onMounted(() => {
+    const canvas = canvasRef.value
+    if (!canvas) return
+
+    canvas.requestPointerLock()
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+    cursor.x = canvas.width / 2
+    cursor.y = canvas.height / 2
+
+    document.addEventListener('mousemove', handlePointerLockMove)
+    document.addEventListener('pointerlockchange', handleLockChange)
+
+    timer = setTimeout(drawRandomCircle, delay.value)
 })
 
 onUnmounted(() => {
     clearTimeout(timer)
+    document.removeEventListener('mousemove', handlePointerLockMove)
+    document.removeEventListener('pointerlockchange', handleLockChange)
+    if (isLocked()) document.exitPointerLock()
 })
 </script>

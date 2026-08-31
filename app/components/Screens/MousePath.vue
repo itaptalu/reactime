@@ -7,6 +7,7 @@
 <script setup lang="ts">
 const mousePath = useState<{ x: number; y: number }[]>('mousePath')
 const reactionTime = useState('reactionTime', () => 0)
+const radius = useState<number>('radius')
 
 const canvasRef = ref()
 
@@ -41,7 +42,7 @@ const drawMousePath = () => {
     const lastPoint = mousePath.value[mousePath.value.length - 1]
 
     ctx.beginPath()
-    ctx.arc(lastPoint!.x, lastPoint!.y, 12, 0, Math.PI * 2)
+    ctx.arc(lastPoint!.x, lastPoint!.y, radius.value, 0, Math.PI * 2)
     ctx.fillStyle = '#2DAA8C'
     ctx.fill()
 

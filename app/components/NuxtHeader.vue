@@ -13,7 +13,7 @@
             <div class="flex-1 flex justify-center">
                 <p v-if="best" class="text-black-500">
                     best result:
-                    <span ref="bestRef" class="font-medium">
+                    <span ref="bestRef" class="font-medium text-primary">
                         {{ displayedBest.toLocaleString() }}
                     </span>
                     ms
