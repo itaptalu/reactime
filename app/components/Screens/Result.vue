@@ -19,7 +19,7 @@
                 </button>
             </div>
         </div>
-        <GameConfig />
+        <GameConfig screen="finish" />
     </div>
 </template>
 

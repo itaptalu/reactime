@@ -2,57 +2,31 @@
     <canvas
         ref="canvasRef"
         class="w-full h-full relative z-0"
-        @contextmenu.prevent="initConfigModal"
         @click="handleCanvasClick"
         @mousemove="handleMouseMove"
     >
         game
     </canvas>
-
-    <Teleport to="body">
-        <div
-            v-if="configModal.show"
-            ref="configModalRef"
-            class="bg-white fixed z-10"
-            :style="configModal.style"
-        >
-            asd
-        </div>
-    </Teleport>
 </template>
 
 <script setup lang="ts">
-import { onClickOutside } from '@vueuse/core'
-
 const emits = defineEmits(['toggleScreen'])
 
 const delay = useState('delay', () => 500 + Math.random() * 1000)
 const radius = useState<number>('radius')
+const best = useState<number>('best')
 const reactionTime = useState('reactionTime', () => 0)
 const mousePath = useState<{ x: number; y: number }[]>('mousePath', () => [])
 
 let timer: ReturnType<typeof setTimeout>
 
-const configModalRef = ref()
 const canvasRef = ref()
 
-const configModal = reactive({
-    show: false,
-    style: {},
-})
 const circle = reactive({
     x: 0,
     y: 0,
     appearedAt: 0,
 })
-
-const initConfigModal = (e: any) => {
-    configModal.style = {
-        left: `${e.clientX + 10}px`,
-        top: `${e.clientY + 10}px`,
-    }
-    // configModal.show = true
-}
 
 const drawRandomCircle = () => {
     const canvas = canvasRef.value
@@ -112,13 +86,21 @@ const handleCanvasClick = (e: MouseEvent) => {
 }
 
 const handleCircleClick = () => {
-    reactionTime.value = performance.now() - circle.appearedAt
+    reactionTime.value = Math.floor(Number(performance.now() - circle.appearedAt))
+
+    updateBest()
     emits('toggleScreen', 'result')
 }
 
-onClickOutside(configModalRef, () => {
-    configModal.show = false
-})
+const updateBest = () => {
+    if (best.value === 0) {
+        best.value = reactionTime.value
+    } else if (reactionTime.value < best.value) {
+        best.value = reactionTime.value
+    }
+
+    localStorage.setItem('best', best.value.toString())
+}
 
 onMounted(() => {
     if (canvasRef.value) {

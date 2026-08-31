@@ -1,7 +1,8 @@
 <template>
     <div
         ref="configRef"
-        class="bg-black-900 w-full p-4 rounded-xl border-2 border-black-700 opacity-0"
+        class="bg-black-900 w-full p-4 rounded-xl border-2 border-black-700"
+        :class="{ 'opacity-0': screen === 'start' }"
     >
         <div class="flex flex-col gap-4">
             <span class="leading-none">Target radius</span>
@@ -20,12 +21,14 @@
 </template>
 
 <script setup lang="ts">
+const props = withDefaults(defineProps<{ screen?: 'start' | 'finish' }>(), { screen: 'start' })
+
 const radius = useState<number>('radius')
 
 const value = ref(radius.value)
 
 const configRef = ref<HTMLDivElement | null>(null)
-const loaded = ref(false)
+const loaded = ref(props.screen !== 'start')
 
 const updateRadius = () => {
     if (typeof value.value === 'object') {
@@ -38,7 +41,7 @@ const updateRadius = () => {
 }
 
 onMounted(() => {
-    if (configRef.value) {
+    if (configRef.value && props.screen === 'start') {
         useAnime(configRef.value, {
             opacity: [0, 1],
             translateX: [100, 0],
